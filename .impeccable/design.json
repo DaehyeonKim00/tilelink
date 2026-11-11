@@ -1,0 +1,241 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-11-10T22:39:41.617267+00:00",
+  "title": "Design System: Tile Link",
+  "extensions": {
+    "colorMeta": {
+      "navy": {
+        "role": "primary",
+        "displayName": "Counter Navy",
+        "canonical": "#1a365d",
+        "tonalRamp": [
+          "#192433",
+          "#1c3a64",
+          "#27518b",
+          "#3268b3",
+          "#588ad0",
+          "#8fb1e0",
+          "#c3d5ee",
+          "#eef2f7"
+        ]
+      },
+      "blue-strong": {
+        "role": "primary",
+        "displayName": "Action Blue",
+        "canonical": "#2b6cb0",
+        "tonalRamp": [
+          "#182634",
+          "#193f66",
+          "#23588f",
+          "#2d71b8",
+          "#5392d5",
+          "#8cb7e3",
+          "#c2d8f0",
+          "#eef2f7"
+        ]
+      },
+      "blue": {
+        "role": "secondary",
+        "displayName": "Joint Blue",
+        "canonical": "#3182ce",
+        "tonalRamp": [
+          "#182734",
+          "#184167",
+          "#225b90",
+          "#2c75b9",
+          "#5296d6",
+          "#8cb9e4",
+          "#c1daf0",
+          "#eef2f7"
+        ]
+      },
+      "ink": {
+        "role": "neutral",
+        "displayName": "Slate Ink",
+        "canonical": "#2d3748",
+        "tonalRamp": [
+          "#21252c",
+          "#313c4e",
+          "#45546e",
+          "#586c8d",
+          "#7b8dad",
+          "#a7b3c8",
+          "#d0d6e2",
+          "#f0f2f4"
+        ]
+      },
+      "muted": {
+        "role": "neutral",
+        "displayName": "Quiet Slate",
+        "canonical": "#4a5568",
+        "tonalRamp": [
+          "#22252a",
+          "#353d4a",
+          "#4a5568",
+          "#5f6e86",
+          "#828fa6",
+          "#acb4c4",
+          "#d2d7df",
+          "#f1f2f4"
+        ]
+      },
+      "paper": {
+        "role": "neutral",
+        "displayName": "Paper",
+        "canonical": "#f7fafc",
+        "tonalRamp": [
+          "#1c2831",
+          "#23465d",
+          "#316182",
+          "#3f7da7",
+          "#639ec5",
+          "#97bed8",
+          "#c7dcea",
+          "#eff3f6"
+        ]
+      }
+    },
+    "typographyMeta": {
+      "display": {
+        "displayName": "Display",
+        "purpose": "The hero headline only."
+      },
+      "headline": {
+        "displayName": "Headline",
+        "purpose": "Section titles."
+      },
+      "title": {
+        "displayName": "Title",
+        "purpose": "Product names and panel titles."
+      },
+      "body": {
+        "displayName": "Body",
+        "purpose": "All running text, 18px base."
+      },
+      "label": {
+        "displayName": "Label",
+        "purpose": "Tags and counts; the smallest size used."
+      }
+    },
+    "shadows": [
+      {
+        "name": "card-hover",
+        "value": "0 6px 18px rgba(26, 54, 93, 0.14)",
+        "purpose": "Product and brand card on hover."
+      },
+      {
+        "name": "header",
+        "value": "0 2px 10px rgba(16, 36, 63, 0.3)",
+        "purpose": "Header sits above the page."
+      },
+      {
+        "name": "call-button",
+        "value": "0 6px 18px rgba(16, 36, 63, 0.4)",
+        "purpose": "Fixed Call button."
+      }
+    ],
+    "motion": [
+      {
+        "name": "ease-out",
+        "value": "cubic-bezier(0.16, 1, 0.3, 1)",
+        "purpose": "Hover and the product-grid rise-in; disabled for reduced motion."
+      }
+    ],
+    "breakpoints": [
+      {
+        "name": "phone",
+        "value": "40rem"
+      },
+      {
+        "name": "tablet",
+        "value": "62rem"
+      }
+    ]
+  },
+  "components": [
+    {
+      "name": "Primary Button",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "The main action: search and add actions.",
+      "html": "<button class=\"ds-btn-primary\">Search</button>",
+      "css": ".ds-btn-primary{min-height:3rem;padding:.6rem 1.25rem;background:#2b6cb0;color:#fff;border:2px solid transparent;border-radius:8px;font:700 1rem 'Absans',system-ui,sans-serif;cursor:pointer}.ds-btn-primary:hover{background:#2c5282}.ds-btn-primary:focus-visible{outline:3px solid #1a365d;outline-offset:3px}"
+    },
+    {
+      "name": "Outline Button",
+      "kind": "button",
+      "refersTo": "button-outline",
+      "description": "Secondary actions such as Show more.",
+      "html": "<button class=\"ds-btn-outline\">Show more</button>",
+      "css": ".ds-btn-outline{min-height:3rem;padding:.6rem 1.25rem;background:#fff;color:#1a365d;border:2px solid #1a365d;border-radius:8px;font:700 1rem 'Absans',system-ui,sans-serif;cursor:pointer}.ds-btn-outline:hover{background:#1a365d;color:#fff}.ds-btn-outline:focus-visible{outline:3px solid #1a365d;outline-offset:3px}"
+    },
+    {
+      "name": "Search Field",
+      "kind": "input",
+      "refersTo": "input-search",
+      "description": "Product search with an attached button.",
+      "html": "<div class=\"ds-search\"><input placeholder=\"Search products\"><button>Search</button></div>",
+      "css": ".ds-search{display:flex;border:2px solid #718096;border-radius:8px;background:#fff;font-family:'Absans',system-ui,sans-serif}.ds-search input{flex:1;min-height:3rem;border:0;padding:0 .75rem;font:inherit;background:transparent;border-radius:8px}.ds-search button{border:0;background:#2b6cb0;color:#fff;font:700 1rem inherit;padding:0 1.25rem;border-radius:0 6px 6px 0}"
+    },
+    {
+      "name": "Filter Chip",
+      "kind": "chip",
+      "refersTo": "chip",
+      "description": "Category filter; the selected chip is solid navy.",
+      "html": "<button class=\"ds-chip\">Adhesive</button> <button class=\"ds-chip ds-chip-on\">Grout</button>",
+      "css": ".ds-chip{min-height:3rem;padding:.4rem 1.1rem;background:#fff;color:#1a365d;border:2px solid #718096;border-radius:999px;font:700 1rem 'Absans',system-ui,sans-serif;cursor:pointer}.ds-chip:hover{background:#edf2f7}.ds-chip-on{background:#1a365d;border-color:#1a365d;color:#fff}"
+    },
+    {
+      "name": "Product Card",
+      "kind": "card",
+      "refersTo": "card",
+      "description": "A product photo, its name, then brand and category tags. No buttons or prices.",
+      "html": "<article class=\"ds-card\"><div class=\"ds-card-media\">Photo</div><h3>Mapei Keraflex Maxi S1 Grey 20kg</h3><p><span>Mapei</span><span>Adhesive</span></p></article>",
+      "css": ".ds-card{width:260px;background:#fff;border:1px solid #cbd5e0;border-radius:8px;overflow:hidden;font-family:'Absans',system-ui,sans-serif;transition:box-shadow .25s,border-color .25s}.ds-card:hover{border-color:#2b6cb0;box-shadow:0 6px 18px rgba(26,54,93,.14)}.ds-card-media{aspect-ratio:1;background:#f7fafc;border-bottom:1px solid #cbd5e0;display:grid;place-items:center;color:#4a5568}.ds-card h3{margin:0;padding:1rem 1.1rem .5rem;font-size:1.15rem;line-height:1.35;color:#1a365d}.ds-card p{margin:0;padding:0 1.1rem 1.1rem;display:flex;gap:.4rem}.ds-card span{background:#edf2f7;color:#2d3748;border-radius:999px;padding:.2rem .65rem;font-size:.9rem}"
+    }
+  ],
+  "narrative": {
+    "northStar": "The Trade Counter",
+    "overview": "Tile Link's site works like a well-run trade counter: everything is labelled clearly, the product is in front of you, and a person is always one step away. It is a catalogue, not a shop. The look is the original navy and blue on white with a faint construction grid as the page ground, large legible type and standard controls.",
+    "keyCharacteristics": [
+      "Navy header and contact band, white working surfaces, blue only for actions and state.",
+      "Large type (18px base, adjustable to 21px and 24px) in one legibility-first face.",
+      "Solid surfaces with 1px slate borders; depth only as a soft hover shadow.",
+      "Contact is present in the header, hero, a fixed Call button and the footer."
+    ],
+    "rules": [
+      {
+        "name": "The Blue Family Rule",
+        "body": "The brand colour is the original navy and blue. No new brand colours.",
+        "section": "colors"
+      },
+      {
+        "name": "The Readable Blue Rule",
+        "body": "Joint Blue (#3182ce) never carries small text.",
+        "section": "colors"
+      },
+      {
+        "name": "The Readability Rule",
+        "body": "Nothing below 0.9rem, no light weights, and the layout holds at the largest text size.",
+        "section": "typography"
+      },
+      {
+        "name": "The Solid Surface Rule",
+        "body": "Text never sits directly on the grid ground.",
+        "section": "elevation"
+      }
+    ],
+    "dos": [
+      "Do keep the navy and blue family as the only brand colours.",
+      "Do keep body text at 18px or larger with 4.5:1 contrast or better.",
+      "Do make every tappable control at least 48px tall.",
+      "Do keep contact details in the footer band and show missing ones as clear placeholders."
+    ],
+    "donts": [
+      "Don't add a cart, prices, customer login or promotions.",
+      "Don't state delivery area, cut-off time or cost until the owner provides them; same-day fast delivery is the confirmed claim.",
+      "Don't use gradients, glass, emoji icons or small labels above headings.",
+      "Don't invent popularity, reviews or stock claims."
+    ]
+  }
+}

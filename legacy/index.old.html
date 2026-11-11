@@ -1,0 +1,806 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tile Link - JSC Import</title>
+    <style>
+        :root {
+            --primary-color: #1a365d;
+            --accent-color: #3182ce;
+            --bg-light: #f7fafc;
+            --text-color: #2d3748;
+            --border-color: #e2e8f0;
+            --danger-color: #e53e3e;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        body { color: var(--text-color); background-color: #fff; line-height: 1.6; scroll-behavior: smooth; }
+
+        /* Header */
+        header { background: var(--primary-color); color: white; padding: 1rem 2rem; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 1000; }
+        .logo { font-size: 1.5rem; font-weight: bold; letter-spacing: 1px; }
+        nav { display: flex; align-items: center; gap: 2rem; }
+        nav a { color: white; text-decoration: none; font-weight: 500; transition: color 0.2s; cursor: pointer; }
+        nav a:hover { color: var(--accent-color); }
+
+        /* Hero */
+        .hero { background: linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)), url('https://images.unsplash.com/photo-1584622650111-993a426fbf0a?auto=format&fit=crop&w=1920&q=80') no-repeat center center/cover; color: white; text-align: center; padding: 8rem 2rem; }
+        .hero h1 { font-size: 3rem; margin-bottom: 1rem; }
+        .hero p { font-size: 1.25rem; margin-bottom: 2rem; }
+        .btn { background: var(--accent-color); color: white; padding: 0.75rem 2rem; border: none; border-radius: 4px; font-size: 1rem; cursor: pointer; text-decoration: none; display: inline-block; transition: background 0.2s; }
+        .btn:hover { background: #2b6cb0; }
+
+        /* Container */
+        .container { max-width: 1200px; margin: 0 auto; padding: 4rem 2rem; }
+        section h2 { font-size: 2rem; margin-bottom: 1.5rem; text-align: center; color: var(--primary-color); }
+
+        /* Categories Filter */
+        .filter-buttons { display: flex; justify-content: center; gap: 0.5rem; margin-bottom: 2rem; flex-wrap: wrap; }
+        .filter-btn { padding: 0.5rem 1.25rem; border: 1px solid var(--border-color); background: white; border-radius: 20px; cursor: pointer; font-weight: 500; transition: all 0.2s; }
+        .filter-btn.active, .filter-btn:hover { background: var(--primary-color); color: white; border-color: var(--primary-color); }
+
+        /* Sub-category Filter Bar */
+        .sub-filter-bar { display: flex; justify-content: center; gap: 0.4rem; margin-bottom: 2rem; flex-wrap: wrap; }
+        .sub-filter-btn { padding: 0.3rem 1rem; border: 1px dashed var(--accent-color); background: #ebf8ff; color: var(--accent-color); border-radius: 15px; cursor: pointer; font-size: 0.9rem; font-weight: 500; transition: all 0.2s; }
+        .sub-filter-btn.active, .sub-filter-btn:hover { background: var(--accent-color); color: white; }
+
+        /* Product Grid */
+        .product-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 2rem; }
+        .product-card { background: white; border: 1px solid var(--border-color); border-radius: 8px; overflow: hidden; box-shadow: 0 4px 6px rgba(0,0,0,0.02); transition: transform 0.2s; position: relative; }
+        .product-card:hover { transform: translateY(-5px); box-shadow: 0 10px 15px rgba(0,0,0,0.05); }
+        .product-img { width: 100%; height: 200px; object-fit: cover; background-color: var(--bg-light); }
+        .product-info { padding: 1.5rem; }
+
+        /* 이미지 준비 전 임시 placeholder (외부 서버 없이 CSS로 표시) */
+        .ph-img { height: 300px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0.4rem; padding: 1.5rem; text-align: center;
+            background: repeating-linear-gradient(45deg, #edf2f7 0 14px, #f7fafc 14px 28px); border-bottom: 1px solid var(--border-color); }
+        .ph-brand { font-size: 1.5rem; font-weight: 800; color: var(--primary-color); letter-spacing: 1px; text-transform: uppercase; }
+        .ph-name { font-size: 0.95rem; color: #4a5568; max-width: 90%; }
+        .ph-note { margin-top: 0.4rem; font-size: 0.75rem; color: #a0aec0; text-transform: uppercase; letter-spacing: 1px; }
+
+        /* 3D Product Pack (포대/박스형 제품 3D 연출) */
+        .pack-stage { position: relative; height: 300px; display: flex; align-items: center; justify-content: center; perspective: 1400px; overflow: hidden;
+            background: radial-gradient(ellipse at 45% 25%, #ffffff 0%, #f1f5f9 50%, #d9e1ea 100%); }
+        /* 바닥 그림자 */
+        .pack-stage::after { content: ''; position: absolute; bottom: 22px; left: 52%; width: 56%; height: 26px; transform: translateX(-50%);
+            background: radial-gradient(ellipse at center, rgba(0,0,0,0.45) 0%, rgba(0,0,0,0.15) 45%, rgba(0,0,0,0) 72%); filter: blur(4px); transition: all 0.6s ease; }
+        /* 둥실 떠 있는 애니메이션 */
+        .pack-float { transform-style: preserve-3d; animation: packFloat 4s ease-in-out infinite; z-index: 1; }
+        @keyframes packFloat { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-6px); } }
+        /* 포대: 판자형 옆면 대신 '부풀어 오른 베개' 형태로 연출 */
+        .pack-3d { position: relative; height: 215px; transform: rotateY(-9deg) rotateX(3deg) rotateZ(-1.5deg);
+            transition: transform 0.8s cubic-bezier(0.2, 0.8, 0.2, 1); }
+        .pack-3d img { height: 100%; display: block; border-radius: 18px / 26px;
+            filter: drop-shadow(10px 14px 12px rgba(0,0,0,0.30)) drop-shadow(2px 3px 3px rgba(0,0,0,0.25)); }
+        /* 위/아래 열접착 봉합선 */
+        .pack-3d::before { content: ''; position: absolute; left: 3%; right: 3%; top: 1.2%; bottom: 1.2%; pointer-events: none; border-radius: 14px;
+            background:
+                repeating-linear-gradient(90deg, rgba(0,0,0,0.22) 0 2px, rgba(255,255,255,0.18) 2px 4px) top / 100% 7px no-repeat,
+                repeating-linear-gradient(90deg, rgba(0,0,0,0.22) 0 2px, rgba(255,255,255,0.18) 2px 4px) bottom / 100% 7px no-repeat;
+            opacity: 0.7; z-index: 2; }
+        /* 볼록한 면의 음영 + 광택 (가장자리는 어둡고 가운데는 밝게) */
+        .pack-3d::after { content: ''; position: absolute; inset: 0; border-radius: 18px / 26px; pointer-events: none; z-index: 1;
+            background:
+                radial-gradient(ellipse 75% 62% at 42% 45%, rgba(255,255,255,0.22) 0%, rgba(255,255,255,0) 55%, rgba(0,0,0,0.10) 80%, rgba(0,0,0,0.38) 100%),
+                linear-gradient(100deg, rgba(255,255,255,0) 18%, rgba(255,255,255,0.32) 27%, rgba(255,255,255,0) 40%),
+                linear-gradient(180deg, rgba(0,0,0,0.25) 0%, rgba(0,0,0,0) 7%, rgba(0,0,0,0) 92%, rgba(0,0,0,0.30) 100%);
+            box-shadow: inset -10px 0 18px rgba(0,0,0,0.22), inset 6px 0 12px rgba(255,255,255,0.25); }
+        .product-card:hover .pack-3d { transform: rotateY(-2deg) rotateX(1deg) rotateZ(0deg) scale(1.05); }
+
+        /* 통(버킷)형 제품 - 사진 자체가 입체라 그림자/조명/회전으로만 연출 */
+        .tub-3d { position: relative; height: 235px; transform-style: preserve-3d; transform: rotateY(-10deg) rotateX(4deg);
+            transition: transform 0.8s cubic-bezier(0.2, 0.8, 0.2, 1); }
+        .tub-3d img { height: 100%; display: block;
+            filter: drop-shadow(14px 16px 14px rgba(0,0,0,0.35)) drop-shadow(2px 4px 4px rgba(0,0,0,0.25)) contrast(1.06) saturate(1.08); }
+        .product-card:hover .tub-3d { transform: rotateY(8deg) rotateX(2deg) scale(1.07); }
+        .product-card:hover .pack-stage::after { width: 52%; opacity: 0.75; }
+        .product-category { font-size: 0.85rem; color: var(--accent-color); font-weight: bold; text-transform: uppercase; margin-bottom: 0.3rem; }
+        .product-sub { font-size: 0.75rem; color: #718096; background: #edf2f7; padding: 0.15rem 0.5rem; border-radius: 4px; display: inline-block; margin-bottom: 0.5rem; }
+        .product-title { font-size: 1.25rem; font-weight: bold; margin-bottom: 0.5rem; }
+        .product-desc { color: #666; font-size: 0.95rem; margin-bottom: 1rem; }
+
+        /* Delete Button */
+        .delete-btn { display: none; background: var(--danger-color); color: white; border: none; padding: 0.4rem 0.8rem; border-radius: 4px; cursor: pointer; font-size: 0.85rem; width: 100%; font-weight: 500; }
+        .delete-btn:hover { background: #c53030; }
+        .product-card.admin-mode .delete-btn { display: block; }
+
+        /* Admin / Management Section */
+        .admin-section { display: none; background: var(--bg-light); padding: 3rem 2rem; border-top: 1px solid var(--border-color); margin-top: 4rem; }
+        .admin-section.active { display: block; }
+        .admin-form { max-width: 600px; margin: 0 auto 2rem auto; background: white; padding: 2rem; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
+        .form-group { margin-bottom: 1.25rem; }
+        .form-group label { display: block; font-weight: 500; margin-bottom: 0.5rem; }
+        .form-group input, .form-group select, .form-group textarea { width: 100%; padding: 0.75rem; border: 1px solid var(--border-color); border-radius: 4px; font-size: 1rem; }
+        .form-group input[type="file"] { padding: 0.5rem; background: #fff; cursor: pointer; }
+        .form-group textarea { resize: vertical; height: 100px; }
+
+        /* Contact Section */
+        .contact { background: var(--primary-color); color: white; text-align: center; padding: 4rem 2rem; }
+
+        /* Footer */
+        footer { background: #111; color: #888; text-align: center; padding: 2rem; font-size: 0.9rem; }
+    </style>
+</head>
+<body>
+
+    <!-- Header -->
+    <header>
+        <div class="logo">TILE LINK <span style="font-size:0.9rem; font-weight:normal; color:#cbd5e0;">(JSC Import)</span></div>
+        <nav>
+            <a href="#hero">Tile</a>
+            <a href="#products">Products</a>
+            <a href="#contact">Contact Us</a>
+            <a id="adminNavLink" onclick="handleAdminNavClick()" style="color: #63b3ed; font-weight: bold;">Admin Login</a>
+        </nav>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="hero" id="hero">
+        <h1>Professional Tile & Building Materials</h1>
+        <p>Reliable Quality, Fast & Friendly Service (F4 Philosophy)</p>
+        <a href="#products" class="btn">Explore Products</a>
+    </section>
+
+    <!-- Products Section -->
+    <section class="container" id="products">
+        <h2>Our Products</h2>
+
+        <!-- Main Category Filter Buttons -->
+        <div class="filter-buttons" id="filterButtons"></div>
+
+        <!-- Sub-Category Filter Bar -->
+        <div class="sub-filter-bar" id="subFilterBar"></div>
+
+        <!-- Product Grid Container -->
+        <div class="product-grid" id="productGrid"></div>
+    </section>
+
+    <!-- Admin Login Area -->
+    <section class="container" id="adminLoginArea" style="display: none; background: #f7fafc; padding: 2rem; border-radius: 8px; margin-top: 3rem; border: 1px solid var(--border-color);">
+        <h2 style="font-size: 1.5rem; margin-bottom: 0.5rem; text-align: center;">Admin Authentication</h2>
+        <p style="font-size: 0.9rem; color: #718096; text-align: center; margin-bottom: 1.5rem;">Please enter your password to access management mode.</p>
+        <div style="max-width: 400px; margin: 0 auto; display: flex; gap: 0.5rem;">
+            <input type="text" id="directPasswordInput" style="flex: 1; padding: 0.75rem; border: 1px solid var(--border-color); border-radius: 4px; font-size: 1rem;" onkeydown="if(event.key === 'Enter') tryDirectLogin()">
+            <button class="btn" onclick="tryDirectLogin()">Login</button>
+        </div>
+    </section>
+
+    <!-- Admin Management Section -->
+    <section class="admin-section" id="adminManageSection">
+        <h2>Category & Product Management (Admin Mode)</h2>
+
+        <!-- 1. 상위 카테고리 추가 폼 -->
+        <div class="admin-form">
+            <h3 style="margin-bottom: 1rem; color: var(--primary-color);">1. Add Main Category</h3>
+            <form onsubmit="addMainCategory(event)">
+                <div class="form-group">
+                    <label for="newMainCat">Main Category Name</label>
+                    <input type="text" id="newMainCat" placeholder="e.g., Grout, Trims" required>
+                </div>
+                <button type="submit" class="btn" style="width: 100%;">Add Main Category</button>
+            </form>
+        </div>
+
+        <!-- 2. 하위 카테고리 추가 폼 -->
+        <div class="admin-form">
+            <h3 style="margin-bottom: 1rem; color: var(--primary-color);">2. Add Sub-Category</h3>
+            <form onsubmit="addSubCategory(event)">
+                <div class="form-group">
+                    <label for="targetMainCat">Select Parent Main Category</label>
+                    <select id="targetMainCat" required></select>
+                </div>
+                <div class="form-group">
+                    <label for="newSubCat">Sub-Category Name</label>
+                    <input type="text" id="newSubCat" placeholder="e.g., Epoxy, Acrylic, Primer" required>
+                </div>
+                <button type="submit" class="btn" style="width: 100%;">Add Sub-Category</button>
+            </form>
+        </div>
+
+        <!-- 3. 제품 등록 폼 -->
+        <div class="admin-form">
+            <h3 style="margin-bottom: 1rem; color: var(--primary-color);">3. Add Product</h3>
+            <form id="productForm" onsubmit="addProduct(event)">
+                <div class="form-group">
+                    <label for="productMainCat">Main Category</label>
+                    <select id="productMainCat" onchange="updateSubCategorySelect()" required></select>
+                </div>
+                <div class="form-group">
+                    <label for="productSubCat">Sub-Category</label>
+                    <select id="productSubCat" required></select>
+                </div>
+                <div class="form-group">
+                    <label for="title">Product Name</label>
+                    <input type="text" id="title" placeholder="e.g., Fast Set Adhesive" required>
+                </div>
+                <div class="form-group">
+                    <label for="imageFile">Upload Product Image</label>
+                    <input type="file" id="imageFile" accept="image/*" required>
+                </div>
+                <div class="form-group">
+                    <label for="desc">Product Description</label>
+                    <textarea id="desc" placeholder="Enter specifications, features, and usage." required></textarea>
+                </div>
+                <button type="submit" class="btn" style="width: 100%;">Add Product</button>
+            </form>
+        </div>
+    </section>
+
+    <!-- Contact Section -->
+    <section class="contact" id="contact">
+        <h2 style="color: white; margin-bottom: 1rem;">Location & Contact Us</h2>
+        <p style="margin-bottom: 0.5rem;">Address: Unit 139-141, 45 Gilby Road, Mount Waverley VIC</p>
+        <p style="margin-bottom: 1.5rem;">Inquiries & Quote Requests: Always Welcome</p>
+        <a href="mailto:sales@tilelink.com.au" class="btn">Email Us</a>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <p>&copy; 2026 JSC Import Pty Ltd (Tile Link). All Rights Reserved.</p>
+    </footer>
+
+    <!-- JavaScript -->
+    <script>
+        // ============================================================
+        // 제품 목록 (products.md 와 동일한 형식: 한 줄 = 한 제품)
+        // 첫 단어 = 브랜드, 나머지 = 제품명 (단, 'SURE LEVEL' 은 두 단어 브랜드)
+        // 하위 카테고리(필터)는 브랜드별로 자동 생성됨
+        // ============================================================
+        const PRODUCT_LIST = {
+            'Adhesive': `
+                SURE LEVEL Sureflex 4000 Rubber 20KG ( OFF WHITE )
+                ATA aus flex Multi Orange 20kg
+                SIKA ECO PRO GREY 20kg
+                BOSTIK CONFLEX 20KG
+                ATA aus flex COMMERCIAL 20kg
+                SSANGKOM Dryfix I (White)
+                BONDED Max stick S1 ( White )
+                SAS Master Pro ( Mastic ) WHITE 20kg
+                ATECH FUTUREBOND MULTI TILE ( 20kg )
+                ATA aus crete MPA WHITE 20kg
+                ATA aus crete MPA GREY 20kg
+                SIKA PROMAXSET WHITE 20kg
+                SIKA PROMAXSET GREY 20kg
+                BOSTIK ULTRAMASTIK 20KG
+                KERAFLEX GREY 20KG
+                SikaTile-305 Master Lite 15kg ( White )
+                SAS Master Pro X-Tech WHITE 20kg.
+                SIKA 400-EVO PRO WHITE 20kg
+                Laticrete Tri-Lite WHITE Lightweight 11kg
+                ATA aus crete Premium GREY 20kg
+                ATA aus crete Premium WHITE 20kg
+                Mapei ULTRALITE S1 WHITE 13.5kg
+                Mapei ULTRALITE S1 GREY 13.5kg
+                Mapei KERAFLEX MAXI S1 WHITE 20kg
+                Mapei KERAFLEX MAXI S1 GREY 20KG
+                BONDED FLEX BOND LITE S2 GREY 72/1P
+                SAS Master Grip lite 15kg ( C2S2T ) WHITE
+                Mapei ULTRALITE S2 Grey 13.5kg
+                Mapei KERAQUICK MAXI S1 GREY
+                ATA Fast Set Powder Additive GREEN lid
+                Mapei KERABOND PLUS GREY 20KG
+                Mapei ISOLASTIC 50 25KG
+                MapeI ISOLASTIC 25KG ( PURE )`,
+            'Premixed Mastic Glue': `
+                SSANGKOM Cerafix PC 7000D - 20kg
+                DAVCO Supamastic 15L
+                ATA aus Mastic D1
+                SSANGKOM Cerafix PLUS - 20kg
+                ARDEX D2 ( 22kg )
+                Mapei TIXOBOND FINE S1 (White) 20kg.`,
+            'Waterproofing': `
+                DUROTECH 007 FC 15L
+                Gripset 38 FC ''Fast Cure'' - 15L
+                ARDEX WPM 155 RAPID 15L
+                Atech WETROOM 15L
+                Bostik DAMPFIX WPM undertile 15L
+                Durotech Duromastic P15 grey
+                Durotech Duromastic P15 blue
+                RLA WPU (grey)
+                SikaTile 110 secure proof 15L
+                Bostik DAMPFIX GOLD 15L ( GOLD-YELLOW )
+                Mapei MAPEGUM WPS 20KG
+                Gripset C-1P 15kg ( 1 Part Flexible Cementitious Membrane )
+                Bostik (3-10) Dampfix Platinum 15L
+                Laticret HYDROBAN 15L
+                ARDEX WPM002 PART A /B KIT
+                Mapei Mapelastic Smart Part (A+B) KIT
+                Durotech Durosheet BFM 1m X 10m Roll Membrane`,
+            'Screeding': `
+                TOPCEM PRONTO AU
+                ATA aus crete Screed N Render - ( Normal Set )
+                ATA aus crete Screed N Render - ( FAST Set )
+                Mapei Mapecem Pronto ( Quick Setting Screed )`,
+            'Leveller': `
+                SURE LEVEL NS45 LEVELLER 20KG
+                MAPEI UC LEVELLER 20KG
+                Mapei ULTRAPLAN 20kg
+                Mapei Ultraplan RENOVATION
+                MAPEI PLANEX HR 20KG ( External )
+                SIKA Level Top 20Kg`,
+            'Cement': `
+                GP CEMENT EUREKA (80/p)
+                Builders SAND AND CEMENT (70/p)
+                Builders QUICK-SET CONCRETE 20kg (70/p)
+                Builders OFF WHITE CEMENT`,
+            'Grout': `
+                Ardex FG8
+                Ardex FSDD
+                Mapei Ultracolor Plus
+                Mapei keracolor FF
+                Davco Sanitized Colorgrout
+                Sika SikaCeram-690 Elite`,
+            'Primer': `
+                PRIMER G 5KG
+                PRIMER G 25KG
+                Duroproof ARW - GP Primer (PINK) - 5L
+                Duroproof ARW - GP Primer (PINK) - 15L
+                BOSTIK MULTIPRIME A530 ( 5L )
+                BOSTIK MULTIPRIME A530 ( 20L )
+                ATA aus Bond Primer and Mortar ( 20L ) WHITE lid
+                Davco Ultraprime 5L
+                Davco Ultraprime 20L
+                ARDEX MULTIPRIME 4L JC
+                SURE LEVEL Undiluted Primer 644 ( 5L )
+                Gripset GP primer- 5Litre Pail
+                Gripset GP primer- 15Litre Pail
+                RLA UNIVERSAL PRIMER 5L
+                MAPEI ECO PRIM GRIP Primer 5KG
+                MAPEI ECO PRIM GRIP Primer 10kg
+                Eco prim T plus 5kg
+                Eco prim T plus 20kg
+                SAS Master Primer ( Blue )_ 1 Litre
+                Sikafloor-14 Prep N Prime Impact 1L
+                Sikafloor-14 Prep N Prime Impact 4L
+                ATA aus Bond Ultra Prime ( 20L ) ORANGE lid`,
+            'Silicon': `
+                Pasco Hypersil 912
+                Pasco Hypersil 912 MATT
+                Pasco Hyperbond
+                Pasco Gap Sealant
+                Mapei Mapesil AC
+                Sika SikaSeal 190N High Flexibility Silicon Sealant
+                Ardex Silicone SE 310ml
+                Maxisil A 310ml Wet Area Silicone`,
+            'Others': `
+                ARDEX grout booster 4L
+                ATA aus Bond Industrial Latex Admix ( 20L ) YELLOW lid
+                MAPEI PLANICRETE SP DRUMS 25 KG`
+        };
+
+        // 두 단어 이상으로 된 브랜드
+        const MULTI_WORD_BRANDS = ['SURE LEVEL'];
+
+        // 브랜드 표기 통일 (대소문자/오타)
+        const BRAND_ALIASES = {
+            'SIKA': 'Sika', 'BOSTIK': 'Bostik', 'MAPEI': 'Mapei', 'MapeI': 'Mapei',
+            'ATECH': 'Atech', 'DUROTECH': 'Durotech', 'Laticret': 'Laticrete',
+            'DAVCO': 'Davco', 'ARDEX': 'Ardex', 'BONDED': 'Bonded', 'TOPCEM': 'Topcem'
+        };
+
+        // 첫 단어가 브랜드가 아니라 제품명의 일부인 경우 (브랜드 지정 + 단어는 제품명에 유지)
+        const PRODUCT_WORD_BRANDS = {
+            'SikaTile': 'Sika', 'SikaTile-305': 'Sika', 'Sikafloor-14': 'Sika',
+            'KERAFLEX': 'Mapei', 'PRIMER': 'Mapei', 'Eco': 'Mapei',  // PRIMER G, Eco Prim T Plus = Mapei 제품
+            'Duroproof': 'Durotech'                                  // Duroproof ARW = Durotech 제품
+        };
+
+        // 실제 사진이 있는 제품 (줄 앞부분이 일치하면 적용)
+        const PRODUCT_IMAGES = [
+            { match: 'ATA aus flex Multi Orange', image: 'images/ata-aus-flex-multi-orange.png', pack: true },
+            { match: 'ATA aus flex COMMERCIAL',   image: 'images/ata-aus-flex-commercial.png',   pack: true },
+            { match: 'ATA aus crete MPA',         image: 'images/ata-aus-crete-mpa.png',         pack: true },
+            { match: 'ATA aus crete Premium',     image: 'images/ata-aus-crete-premium.png',     pack: true },
+            { match: 'ATA aus Mastic D1',         image: 'images/ata-aus-mastic-d1.png',         pack: 'tub' },
+            { match: 'ATA aus crete Screed N Render - ( Normal Set )', image: 'images/ata-screed-n-render-normal.png', pack: true },
+            { match: 'ATA aus crete Screed N Render - ( FAST Set )',   image: 'images/ata-screed-n-render-fast.png',   pack: true },
+
+            // Adhesive (웹 수집 → 배경 제거/크롭 → 'photo' 3D 연출)
+            { match: 'SIKA ECO PRO',            image: 'images/sika-ecopro.png',            pack: 'photo' },
+            { match: 'BOSTIK CONFLEX',          image: 'images/bostik-conflex.png',         pack: 'photo' },
+            { match: 'BONDED Max stick',        image: 'images/bonded-maxstick-s1.png',     pack: 'photo' },
+            { match: 'SAS Master Pro ( Mastic', image: 'images/sas-masterpro.png',          pack: 'photo' },
+            { match: 'SAS Master Pro X-Tech',   image: 'images/sas-masterpro-xtech.png',    pack: 'photo' },
+            { match: 'SAS Master Grip',         image: 'images/sas-mastergrip-lite.png',    pack: 'photo' },
+            { match: 'SIKA PROMAXSET WHITE',    image: 'images/sika-promaxset-white.png',   pack: 'photo' },
+            { match: 'SIKA PROMAXSET GREY',     image: 'images/sika-promaxset-grey.png',    pack: 'photo' },
+            { match: 'SikaTile-305',            image: 'images/sika-305-masterlite.png',    pack: 'photo' },
+            { match: 'BOSTIK ULTRAMASTIK',      image: 'images/bostik-ultramastik.png',     pack: 'photo' },
+            { match: 'KERAFLEX GREY',           image: 'images/mapei-keraflex.png',         pack: 'photo' },
+            { match: 'Laticrete Tri-Lite',      image: 'images/laticrete-trilite.png',      pack: 'photo' },
+            { match: 'Mapei ULTRALITE S1',      image: 'images/mapei-ultralite-s1.png',     pack: 'photo' },
+            { match: 'Mapei ULTRALITE S2',      image: 'images/mapei-ultralite-s2.png',     pack: 'photo' },
+            { match: 'Mapei KERAFLEX MAXI',     image: 'images/mapei-keraflex-maxi-s1.png', pack: 'photo' },
+            { match: 'Mapei KERAQUICK',         image: 'images/mapei-keraquick-maxi-s1.png',pack: 'photo' },
+            { match: 'Mapei KERABOND PLUS',     image: 'images/mapei-kerabond-plus.png',    pack: 'photo' },
+            { match: 'Mapei ISOLASTIC 50',      image: 'images/mapei-isolastic-50.png',     pack: 'photo' },
+            { match: 'MapeI ISOLASTIC 25KG',    image: 'images/mapei-isolastic.png',        pack: 'photo' },
+            { match: 'SURE LEVEL Sureflex',     image: 'images/sureflex-4000-rubber.png',   pack: 'photo' },
+            { match: 'SSANGKOM Dryfix',         image: 'images/ssangkom-dryfix-1.png',      pack: 'photo' },
+            { match: 'ATECH FUTUREBOND',        image: 'images/atech-futurebond.png',       pack: 'photo' },
+            { match: 'SIKA 400-EVO',            image: 'images/sika-400-evo-pro.png',       pack: 'photo' },
+            { match: 'BONDED FLEX BOND LITE',   image: 'images/bonded-flexbond-lite-s2.png',pack: 'photo' },
+            { match: 'ATA Fast Set Powder',     image: 'images/ata-fast-set-additive.png',  pack: 'photo' },
+
+            // Premixed Mastic Glue
+            { match: 'DAVCO Supamastic',        image: 'images/davco-supamastic.png',       pack: 'photo' },
+            { match: 'ARDEX D2',                image: 'images/ardex-d2.png',               pack: 'photo' },
+            { match: 'Mapei TIXOBOND',          image: 'images/mapei-tixobond-fine-s1.png', pack: 'photo' },
+            { match: 'SSANGKOM Cerafix PC',     image: 'images/ssangkom-cerafix-pc7000d.png', pack: 'photo' },
+            { match: 'SSANGKOM Cerafix PLUS',   image: 'images/ssangkom-cerafix-plus.png',  pack: 'photo' },
+
+            // Waterproofing
+            { match: 'DUROTECH 007 FC',         image: 'images/durotech-007fc.png',         pack: 'photo' },
+            { match: 'Durotech Duromastic P15', image: 'images/durotech-duromastic-p15.png',pack: 'photo' },
+            { match: 'Durotech Durosheet',      image: 'images/durotech-durosheet-bfm.png', pack: 'photo' },
+            { match: 'Gripset 38 FC',           image: 'images/gripset-38fc.png',           pack: 'photo' },
+            { match: 'Gripset C-1P',            image: 'images/gripset-c1p.png',            pack: 'photo' },
+            { match: 'ARDEX WPM 155',           image: 'images/ardex-wpm155-rapid.png',     pack: 'photo' },
+            { match: 'ARDEX WPM002',            image: 'images/ardex-wpm002.png',           pack: 'photo' },
+            { match: 'Atech WETROOM',           image: 'images/atech-wetroom.png',          pack: 'photo' },
+            { match: 'Bostik DAMPFIX WPM',      image: 'images/bostik-dampfix-wpm.png',     pack: 'photo' },
+            { match: 'Bostik DAMPFIX GOLD',     image: 'images/bostik-dampfix-gold.png',    pack: 'photo' },
+            { match: 'Bostik (3-10) Dampfix Platinum', image: 'images/bostik-dampfix-platinum.png', pack: 'photo' },
+            { match: 'RLA WPU',                 image: 'images/rla-wpu.png',                pack: 'photo' },
+            { match: 'SikaTile 110',            image: 'images/sika-110-secureproof.png',   pack: 'photo' },
+            { match: 'Mapei MAPEGUM WPS',       image: 'images/mapei-mapegum-wps.png',      pack: 'photo' },
+            { match: 'Laticret HYDROBAN',       image: 'images/laticrete-hydroban.png',     pack: 'photo' },
+            { match: 'Mapei Mapelastic Smart',  image: 'images/mapei-mapelastic-smart.png', pack: 'photo' },
+
+            // Screeding
+            { match: 'TOPCEM PRONTO',           image: 'images/topcem-pronto.png',          pack: 'photo' },
+            { match: 'Mapei Mapecem Pronto',    image: 'images/mapei-mapecem-pronto.png',   pack: 'photo' },
+
+            // Leveller
+            { match: 'SURE LEVEL NS45',         image: 'images/surelevel-ns45-leveller.png', pack: 'photo' },
+            { match: 'MAPEI UC LEVELLER',      image: 'images/mapei-uc-leveller.png',      pack: 'photo' },
+            { match: 'Mapei Ultraplan RENOVATION', image: 'images/mapei-ultraplan-renovation.png', pack: 'photo' },
+            { match: 'Mapei ULTRAPLAN 20kg',    image: 'images/mapei-ultraplan.png',        pack: 'photo' },
+            { match: 'SIKA Level Top',          image: 'images/sika-level-top.png',         pack: 'photo' },
+            { match: 'MAPEI PLANEX HR',         image: 'images/mapei-planex-hr.png',        pack: 'photo' },
+
+            // Cement
+            { match: 'Builders SAND AND CEMENT',image: 'images/builders-sand-cement.png',   pack: 'photo' },
+            { match: 'GP CEMENT EUREKA',        image: 'images/eureka-gp-cement.png',       pack: 'photo' },
+            { match: 'Builders QUICK-SET',      image: 'images/builders-quick-set-concrete.png', pack: 'photo' },
+            { match: 'Builders OFF WHITE',      image: 'images/builders-off-white-cement.png',   pack: 'photo' },
+
+            // Grout
+            { match: 'Ardex FG8',               image: 'images/ardex-fg8.png',              pack: 'photo' },
+            { match: 'Ardex FSDD',              image: 'images/ardex-fsdd.png',             pack: 'photo' },
+            { match: 'Mapei keracolor FF',      image: 'images/mapei-keracolor-ff.png',     pack: 'photo' },
+            { match: 'Davco Sanitized Colorgrout', image: 'images/davco-colorgrout.png',    pack: 'photo' },
+            { match: 'Mapei Ultracolor Plus',   image: 'images/mapei-ultracolor-plus.png',  pack: 'photo' },
+            { match: 'Sika SikaCeram-690',      image: 'images/sika-sikaceram-690-elite.png', pack: 'photo' },
+
+            // Primer
+            { match: 'PRIMER G',                image: 'images/mapei-primer-g.png',         pack: 'photo' },
+            { match: 'BOSTIK MULTIPRIME',       image: 'images/bostik-multiprime.png',      pack: 'photo' },
+            { match: 'Davco Ultraprime',        image: 'images/davco-ultraprime.png',       pack: 'photo' },
+            { match: 'ARDEX MULTIPRIME',        image: 'images/ardex-multiprime.png',       pack: 'photo' },
+            { match: 'Gripset GP primer',       image: 'images/gripset-gp-primer.png',      pack: 'photo' },
+            { match: 'RLA UNIVERSAL PRIMER',    image: 'images/rla-universal-primer.png',   pack: 'photo' },
+            { match: 'MAPEI ECO PRIM GRIP',     image: 'images/mapei-eco-prim-grip.png',    pack: 'photo' },
+            { match: 'Eco prim T plus',         image: 'images/mapei-eco-prim-t-plus.png',  pack: 'photo' },
+            { match: 'SAS Master Primer',       image: 'images/sas-master-primer.png',      pack: 'photo' },
+            { match: 'Duroproof ARW',           image: 'images/durotech-duroproof-arw.png', pack: 'photo' },
+            { match: 'ATA aus Bond Primer and Mortar', image: 'images/ata-ausbond-primer-mortar.png', pack: 'photo' },
+            { match: 'SURE LEVEL Undiluted Primer', image: 'images/surelevel-undiluted-primer.png', pack: 'photo' },
+            { match: 'Sikafloor-14',            image: 'images/sikafloor-14-prep-n-prime.png', pack: 'photo' },
+            { match: 'ATA aus Bond Ultra Prime', image: 'images/ata-ausbond-ultra-prime.png', pack: 'photo' },
+
+            // Silicon
+            { match: 'Pasco Hypersil 912 MATT', image: 'images/pasco-hypersil-912-matt.png', pack: 'photo' },
+            { match: 'Pasco Hypersil 912',      image: 'images/pasco-hypersil-912.png',     pack: 'photo' },
+            { match: 'Pasco Hyperbond',         image: 'images/pasco-hyperbond.png',        pack: 'photo' },
+            { match: 'Pasco Gap Sealant',       image: 'images/pasco-gap-sealant.png',      pack: 'photo' },
+            { match: 'Mapei Mapesil AC',        image: 'images/mapei-mapesil-ac.png',       pack: 'photo' },
+            { match: 'Ardex Silicone SE',       image: 'images/ardex-se.png',               pack: 'photo' },
+            { match: 'Maxisil A',               image: 'images/maxisil-a.png',              pack: 'photo' },
+            { match: 'Sika SikaSeal 190N',      image: 'images/sika-sikaseal-190n.png',     pack: 'photo' },
+
+            // Others
+            { match: 'ARDEX grout booster',     image: 'images/ardex-grout-booster.png',    pack: 'photo' },
+            { match: 'MAPEI PLANICRETE SP',     image: 'images/mapei-planicrete-sp.png',    pack: 'photo' },
+            { match: 'ATA aus Bond Industrial Latex', image: 'images/ata-ausbond-latex-admix.png', pack: 'photo' }
+        ];
+
+        function parseProductLine(line, category) {
+            let brandRaw, name;
+            const multi = MULTI_WORD_BRANDS.find(b => line.toUpperCase().startsWith(b + ' '));
+            if (multi) {
+                brandRaw = multi;
+                name = line.slice(multi.length).trim();
+            } else {
+                const idx = line.indexOf(' ');
+                brandRaw = idx === -1 ? line : line.slice(0, idx);
+                name = idx === -1 ? '' : line.slice(idx + 1).trim();
+            }
+            let brand = BRAND_ALIASES[brandRaw] || brandRaw;
+            if (PRODUCT_WORD_BRANDS[brandRaw]) {
+                brand = PRODUCT_WORD_BRANDS[brandRaw];
+                name = line;
+            }
+            name = name.replace(/\.$/, '').replace(/\s*_\s*/g, ' ').replace(/\s+/g, ' ');
+            const img = PRODUCT_IMAGES.find(m => line.toLowerCase().startsWith(m.match.toLowerCase()));
+            return { category, sub: brand, brand, title: name, image: img ? img.image : '', pack: img ? img.pack : false, desc: '' };
+        }
+
+        // 데모 제품 (Tile / Tools / Angles - 추후 교체)
+        const demoProducts = [
+            { category: 'Tile', sub: 'Floor & Wall', title: 'Modern Grey Porcelain Tile', image: 'https://images.unsplash.com/photo-1507089947368-19c1da9775ae?auto=format&fit=crop&w=600&q=80', desc: 'High-strength porcelain material, suitable for both walls and floors (600x600)' },
+            { category: 'Tools', sub: 'Cutting & Measuring', title: 'Professional Tile Cutter & Tools', image: 'https://images.unsplash.com/photo-1504148455328-c376907d081c?auto=format&fit=crop&w=600&q=80', desc: 'Professional-grade tiling tools ensuring precise and clean installation' },
+            { category: 'Angles', sub: 'Trims & Beads', title: 'Stainless Tile Trim Angle', image: 'https://images.unsplash.com/photo-1530124566582-a618bc2615dc?auto=format&fit=crop&w=600&q=80', desc: 'High-quality stainless steel corner bead/angle for edge protection and finishing' }
+        ];
+
+        let categoryStructure = { 'Tile': ['Floor & Wall', 'Porcelain', 'Ceramic'] };
+        let products = [demoProducts[0]];
+
+        Object.entries(PRODUCT_LIST).forEach(([category, text]) => {
+            const items = text.split('\n').map(l => l.trim()).filter(Boolean).map(l => parseProductLine(l, category));
+            categoryStructure[category] = [...new Set(items.map(p => p.brand))];
+            products.push(...items);
+        });
+
+        categoryStructure['Tools'] = ['Cutting & Measuring', 'Trowels & Floats'];
+        categoryStructure['Angles'] = ['Trims & Beads', 'Transitions'];
+        products.push(demoProducts[1], demoProducts[2]);
+
+        let isAdminLoggedIn = false;
+        let currentMainFilter = 'all';
+        let currentSubFilter = 'all';
+
+        function renderApp() {
+            renderMainCategoryButtons();
+            renderSubCategoryBar();
+            renderProducts();
+            if (isAdminLoggedIn) {
+                updateAdminSelects();
+            }
+        }
+
+        // 동적 이벤트 바인딩으로 클릭 오작동 원천 차단
+        function renderMainCategoryButtons() {
+            const container = document.getElementById('filterButtons');
+            container.innerHTML = '';
+
+            // All 버튼 생성
+            const allBtn = document.createElement('button');
+            allBtn.className = 'filter-btn ' + (currentMainFilter === 'all' ? 'active' : '');
+            allBtn.textContent = 'All';
+            allBtn.onclick = function() { setMainFilter('all'); };
+            container.appendChild(allBtn);
+
+            // 각 상위 카테고리 버튼 생성
+            Object.keys(categoryStructure).forEach(mainCat => {
+                const btn = document.createElement('button');
+                btn.className = 'filter-btn ' + (currentMainFilter === mainCat ? 'active' : '');
+                btn.textContent = mainCat;
+                btn.onclick = function() { setMainFilter(mainCat); };
+                container.appendChild(btn);
+            });
+        }
+
+        function setMainFilter(mainCat) {
+            currentMainFilter = mainCat;
+            currentSubFilter = 'all';
+            renderApp();
+        }
+
+        // 하위 카테고리 버튼 동적 생성
+        function renderSubCategoryBar() {
+            const bar = document.getElementById('subFilterBar');
+            bar.innerHTML = '';
+
+            if (currentMainFilter === 'all' || !categoryStructure[currentMainFilter] || categoryStructure[currentMainFilter].length === 0) {
+                return;
+            }
+
+            const allSubBtn = document.createElement('button');
+            allSubBtn.className = 'sub-filter-btn ' + (currentSubFilter === 'all' ? 'active' : '');
+            allSubBtn.textContent = `All (${currentMainFilter})`;
+            allSubBtn.onclick = function() { setSubFilter('all'); };
+            bar.appendChild(allSubBtn);
+
+            categoryStructure[currentMainFilter].forEach(subCat => {
+                const btn = document.createElement('button');
+                btn.className = 'sub-filter-btn ' + (currentSubFilter === subCat ? 'active' : '');
+                btn.textContent = subCat;
+                btn.onclick = function() { setSubFilter(subCat); };
+                bar.appendChild(btn);
+            });
+        }
+
+        function setSubFilter(subCat) {
+            currentSubFilter = subCat;
+            renderSubCategoryBar();
+            renderProducts();
+        }
+
+        function renderProducts() {
+            const grid = document.getElementById('productGrid');
+            grid.innerHTML = '';
+
+            let filtered = products;
+            if (currentMainFilter !== 'all') {
+                filtered = filtered.filter(p => p.category === currentMainFilter);
+            }
+            if (currentSubFilter !== 'all') {
+                filtered = filtered.filter(p => p.sub === currentSubFilter);
+            }
+
+            if (filtered.length === 0) {
+                grid.innerHTML = '<p style="grid-column: 1/-1; text-align:center; color:#888;">No products registered in this category.</p>';
+                return;
+            }
+
+            filtered.forEach((p) => {
+                const originalIndex = products.indexOf(p);
+                const subTag = p.sub ? `<div class="product-sub">${p.sub}</div>` : '';
+                const card = document.createElement('div');
+                card.className = 'product-card' + (isAdminLoggedIn ? ' admin-mode' : '');
+                const fallback = `onerror="this.onerror=null; this.src='https://placehold.co/600x400?text=No+Image'"`;
+                const imgHtml = !p.image
+                    ? `<div class="ph-img"><div class="ph-brand">${p.brand || p.sub || ''}</div><div class="ph-name">${p.title}</div><div class="ph-note">Image coming soon</div></div>`
+                    : (p.pack === 'tub' || p.pack === 'photo')
+                    ? `<div class="pack-stage"><div class="pack-float"><div class="tub-3d"><img src="${p.image}" alt="${p.title}" ${fallback}></div></div></div>`
+                    : p.pack
+                    ? `<div class="pack-stage"><div class="pack-float"><div class="pack-3d" style="--pack-side:${p.packSide || '#a0aec0'}"><img src="${p.image}" alt="${p.title}" ${fallback}></div></div></div>`
+                    : `<img src="${p.image}" alt="${p.title}" class="product-img" ${fallback}>`;
+                card.innerHTML = `
+                    ${imgHtml}
+                    <div class="product-info">
+                        <div class="product-category">${p.category}</div>
+                        ${subTag}
+                        <div class="product-title">${p.title}</div>
+                        ${p.desc ? `<div class="product-desc">${p.desc}</div>` : ''}
+                        <button class="delete-btn" onclick="deleteProduct(${originalIndex})">Delete Item</button>
+                    </div>
+                `;
+                grid.appendChild(card);
+            });
+        }
+
+        function updateAdminSelects() {
+            const targetMain = document.getElementById('targetMainCat');
+            targetMain.innerHTML = '';
+            Object.keys(categoryStructure).forEach(cat => {
+                targetMain.innerHTML += `<option value="${cat}">${cat}</option>`;
+            });
+
+            const prodMain = document.getElementById('productMainCat');
+            prodMain.innerHTML = '';
+            Object.keys(categoryStructure).forEach(cat => {
+                prodMain.innerHTML += `<option value="${cat}">${cat}</option>`;
+            });
+
+            updateSubCategorySelect();
+        }
+
+        function updateSubCategorySelect() {
+            const prodMainVal = document.getElementById('productMainCat').value;
+            const prodSub = document.getElementById('productSubCat');
+            prodSub.innerHTML = '';
+
+            if (categoryStructure[prodMainVal]) {
+                categoryStructure[prodMainVal].forEach(sub => {
+                    prodSub.innerHTML += `<option value="${sub}">${sub}</option>`;
+                });
+            }
+        }
+
+        function handleAdminNavClick() {
+            const navLink = document.getElementById('adminNavLink');
+            const loginArea = document.getElementById('adminLoginArea');
+            const manageSection = document.getElementById('adminManageSection');
+
+            if (!isAdminLoggedIn) {
+                loginArea.style.display = 'block';
+                loginArea.scrollIntoView({ behavior: 'smooth' });
+                document.getElementById('directPasswordInput').focus();
+            } else {
+                isAdminLoggedIn = false;
+                manageSection.classList.remove('active');
+                loginArea.style.display = 'none';
+                navLink.textContent = "Admin Login";
+                alert("Logged out from admin mode.");
+                renderApp();
+            }
+        }
+
+        function tryDirectLogin() {
+            const pwdInput = document.getElementById('directPasswordInput');
+            const pwd = pwdInput.value.trim();
+            const navLink = document.getElementById('adminNavLink');
+            const loginArea = document.getElementById('adminLoginArea');
+            const manageSection = document.getElementById('adminManageSection');
+
+            if (pwd === "Martin1004") {
+                isAdminLoggedIn = true;
+                loginArea.style.display = 'none';
+                manageSection.classList.add('active');
+                navLink.textContent = "Admin Logout";
+                pwdInput.value = '';
+                alert("Admin mode activated successfully!");
+                renderApp();
+                manageSection.scrollIntoView({ behavior: 'smooth' });
+            } else {
+                alert("Incorrect password!");
+                pwdInput.value = '';
+                pwdInput.focus();
+            }
+        }
+
+        function addMainCategory(event) {
+            event.preventDefault();
+            if (!isAdminLoggedIn) return;
+            const newCat = document.getElementById('newMainCat').value.trim();
+            if (newCat && !categoryStructure[newCat]) {
+                categoryStructure[newCat] = [];
+                renderApp();
+                document.getElementById('newMainCat').value = '';
+                alert(`Main category "${newCat}" added successfully!`);
+            } else {
+                alert("Category already exists or invalid name.");
+            }
+        }
+
+        function addSubCategory(event) {
+            event.preventDefault();
+            if (!isAdminLoggedIn) return;
+            const mainCat = document.getElementById('targetMainCat').value;
+            const newSub = document.getElementById('newSubCat').value.trim();
+
+            if (newSub && categoryStructure[mainCat]) {
+                if (!categoryStructure[mainCat].includes(newSub)) {
+                    categoryStructure[mainCat].push(newSub);
+                    renderApp();
+                    document.getElementById('newSubCat').value = '';
+                    alert(`Sub-category "${newSub}" added to "${mainCat}" successfully!`);
+                } else {
+                    alert("This sub-category already exists in the selected main category.");
+                }
+            }
+        }
+
+        function addProduct(event) {
+            event.preventDefault();
+            if (!isAdminLoggedIn) return;
+
+            const category = document.getElementById('productMainCat').value;
+            const sub = document.getElementById('productSubCat').value;
+            const title = document.getElementById('title').value;
+            const desc = document.getElementById('desc').value;
+            const imageFileInput = document.getElementById('imageFile');
+
+            if (imageFileInput.files && imageFileInput.files[0]) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const image = e.target.result;
+
+                    products.unshift({ category, sub, title, image, desc });
+                    renderApp();
+
+                    document.getElementById('productForm').reset();
+                    updateSubCategorySelect();
+                    alert('New product successfully added!');
+                    document.getElementById('products').scrollIntoView({ behavior: 'smooth' });
+                };
+                reader.readAsDataURL(imageFileInput.files[0]);
+            }
+        }
+
+        function deleteProduct(index) {
+            if (!isAdminLoggedIn) return;
+            if (confirm("Are you sure you want to delete this product?")) {
+                products.splice(index, 1);
+                renderApp();
+                alert("Product deleted successfully.");
+            }
+        }
+
+        // 초기 앱 실행
+        renderApp();
+    </script>
+</body>
+</html>
