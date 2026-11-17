@@ -19,6 +19,9 @@ npm run preview    # try the built site locally
 | --- | --- |
 | Phone numbers, map, email, address | `src/data/config.ts` (`CONTACT`) |
 | The promise panel shown beside the headline (the same-day delivery line is confirmed; add the delivery area and cut-off time when known) | `src/data/config.ts` (`F4`) |
+| The RD trim range: each trim, its colours, sizes and product codes, and its images (in `public/images/trims/`) | `src/data/trims.ts` |
+| The BAT trim range, generated from products.md (`#battrim range`), with images in `public/images/trims-bat/` | `src/data/batTrims.ts` |
+| Colour swatch buttons for both trim ranges (`public/images/swatches/`) | `src/data/swatches.ts` |
 | Opening hours | `src/data/hours.ts` |
 | Which products appear under "Featured products" | `src/data/config.ts` (`FEATURED_LINES`, must match a line in the product list exactly) |
 | Products per page | `src/data/config.ts` (`PAGE_SIZE`) |

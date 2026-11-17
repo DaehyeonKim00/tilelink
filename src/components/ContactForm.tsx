@@ -23,8 +23,9 @@ function validate(f: Fields): Partial<Record<keyof Fields, string>> {
   return errors
 }
 
-export function ContactForm() {
-  const [fields, setFields] = useState<Fields>(EMPTY)
+export function ContactForm({ about = '' }: { about?: string }) {
+  // Arriving from a product page fills in which product the visitor is asking about.
+  const [fields, setFields] = useState<Fields>(() => (about ? { ...EMPTY, message: `I would like to ask about: ${about}\n\n` } : EMPTY))
   const [errors, setErrors] = useState<Partial<Record<keyof Fields, string>>>({})
   const [status, setStatus] = useState<Status>('idle')
   const [trap, setTrap] = useState('') // hidden field: only automatic spam programs fill it in

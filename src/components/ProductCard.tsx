@@ -1,5 +1,6 @@
 import { useState } from 'react'
-import { ImageOff, Trash2 } from 'lucide-react'
+import { Link } from 'react-router-dom'
+import { ChevronRight, ImageOff, Trash2 } from 'lucide-react'
 import type { Product } from '../types'
 
 interface Props {
@@ -15,7 +16,7 @@ export function ProductCard({ product, index = 0, adminMode = false, onDelete }:
   const hasImage = product.image && !broken
 
   return (
-    <article className="card" style={{ ['--i' as string]: index }}>
+    <article className={product.detailId ? 'card card--linked' : 'card'} style={{ ['--i' as string]: index }}>
       <div className="card__media">
         {hasImage ? (
           <img src={product.image} alt={product.title} loading="lazy" onError={() => setBroken(true)} />
@@ -27,7 +28,20 @@ export function ProductCard({ product, index = 0, adminMode = false, onDelete }:
         )}
       </div>
       <div className="card__body">
-        <h3 className="card__title">{product.title}</h3>
+        <h3 className="card__title">
+          {product.detailId ? (
+            <Link to={`/product/${product.detailId}`} className="card__link">
+              {product.title}
+            </Link>
+          ) : (
+            product.title
+          )}
+        </h3>
+        {product.detailId && (
+          <span className="card__more">
+            See colours and sizes <ChevronRight aria-hidden="true" size={18} />
+          </span>
+        )}
         <ul className="card__tags" aria-label="Brand and category">
           <li>{product.brand}</li>
           <li>{product.category}</li>

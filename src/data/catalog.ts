@@ -2,6 +2,7 @@ import type { Product } from '../types'
 import { slug, tidyName } from '../utils'
 import { PLANNED_CATEGORIES } from './config'
 import { PRODUCT_IMAGES, PRODUCT_LIST } from './catalogData'
+import { ALL_TRIMS, TRIM_CATEGORY } from './trims'
 
 const BASE = import.meta.env.BASE_URL
 
@@ -55,13 +56,25 @@ function parseLine(line: string, category: string): Product {
   }
 }
 
-export const BASE_PRODUCTS: Product[] = Object.entries(PRODUCT_LIST).flatMap(([category, lines]) =>
-  lines.map((line) => parseLine(line, category)),
-)
+/** The trim range: one card per trim, each with its own page for colours, sizes and codes. */
+const TRIM_PRODUCTS: Product[] = ALL_TRIMS.map((t) => ({
+  id: `trim-${t.id}`,
+  line: `${t.brand} ${t.name}`,
+  category: TRIM_CATEGORY,
+  brand: t.brand,
+  title: `${t.brand} ${t.name}`,
+  image: t.images[0] ? `${BASE}images/${t.images[0].file}` : '',
+  detailId: t.id,
+}))
+
+export const BASE_PRODUCTS: Product[] = [
+  ...Object.entries(PRODUCT_LIST).flatMap(([category, lines]) => lines.map((line) => parseLine(line, category))),
+  ...TRIM_PRODUCTS,
+]
 
 /** Categories in the order they appear on the site: the ones with products first, planned ones after. */
 export function categoriesOf(products: Product[], extra: string[] = []): string[] {
-  const order = [...Object.keys(PRODUCT_LIST), ...PLANNED_CATEGORIES, ...extra]
+  const order = [TRIM_CATEGORY, ...Object.keys(PRODUCT_LIST), ...PLANNED_CATEGORIES, ...extra]
   const seen = new Set<string>()
   const result: string[] = []
   for (const c of order) {

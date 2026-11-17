@@ -5,6 +5,7 @@ import { AdminPage } from './pages/AdminPage'
 import { Contact } from './pages/Contact'
 import { Home } from './pages/Home'
 import { Products } from './pages/Products'
+import { TrimDetail } from './pages/TrimDetail'
 
 // HashRouter keeps every address working on any plain web host (no server settings needed), for example /#/products
 export default function App() {
@@ -15,6 +16,7 @@ export default function App() {
           <Route element={<Layout />}>
             <Route index element={<Home />} />
             <Route path="products" element={<Products />} />
+            <Route path="product/:id" element={<TrimDetail />} />
             <Route path="contact" element={<Contact />} />
             <Route path="admin" element={<AdminPage />} />
             <Route path="*" element={<Navigate to="/" replace />} />

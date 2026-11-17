@@ -10,4 +10,6 @@ export interface Product {
   image: string
   /** True for products added in admin mode (stored in this browser). */
   custom?: boolean
+  /** Set for products with their own page (colours, sizes and codes): the page is /#/product/<detailId>. */
+  detailId?: string
 }

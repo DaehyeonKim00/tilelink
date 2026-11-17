@@ -26,6 +26,7 @@ export function Layout() {
   }, [location.pathname, location.state])
 
   useEffect(() => {
+    if (location.pathname.startsWith('/product/')) return // the product page sets its own title
     const titles: Record<string, string> = { '/products': 'All products - Tile Link', '/contact': 'Contact us - Tile Link', '/admin': 'Admin - Tile Link' }
     document.title = titles[location.pathname] ?? 'Tile Link - JSC Import'
   }, [location.pathname])

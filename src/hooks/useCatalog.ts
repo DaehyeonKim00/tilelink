@@ -3,6 +3,7 @@ import type { Product } from '../types'
 import { BASE_PRODUCTS, categoriesOf } from '../data/catalog'
 import { PLANNED_CATEGORIES } from '../data/config'
 import { PRODUCT_LIST } from '../data/catalogData'
+import { TRIM_CATEGORY } from '../data/trims'
 
 const KEY = 'tilelink.admin.v1'
 
@@ -52,7 +53,7 @@ export function useCatalog() {
 
   /** Every category the admin form may use, including empty ones. */
   const categoryOptions = useMemo(
-    () => [...new Set([...Object.keys(PRODUCT_LIST), ...PLANNED_CATEGORIES, ...stored.categories])],
+    () => [...new Set([TRIM_CATEGORY, ...Object.keys(PRODUCT_LIST), ...PLANNED_CATEGORIES, ...stored.categories])],
     [stored.categories],
   )
 

@@ -1,10 +1,11 @@
-import { Link } from 'react-router-dom'
+import { Link, useSearchParams } from 'react-router-dom'
 import { Clock, MapPin, Phone } from 'lucide-react'
 import { CONTACT, telHref } from '../data/config'
 import { ContactForm } from '../components/ContactForm'
 import { HoursStatus } from '../components/Hours'
 
 export function Contact() {
+  const [params] = useSearchParams()
   return (
     <>
       <div className="page-head container">
@@ -18,7 +19,7 @@ export function Contact() {
       </div>
 
       <section className="section container contact-page" aria-label="Contact us">
-        <ContactForm />
+        <ContactForm about={params.get('about') ?? ''} />
 
         <aside className="panel quick" aria-labelledby="quick-title">
           <h2 id="quick-title" className="panel__title">
