@@ -1,4 +1,4 @@
-// The RD trim range: every trim with its colours, sizes and product codes.
+// The Roberts Design trim range: every trim with its colours, sizes and product codes.
 // Copied from the supplier catalogue (Tile Trims and Edging Profiles). The code list per size is the source of truth.
 // To add a size or colour, add a [colour, code] pair under that size in `sizes`.
 
@@ -659,9 +659,9 @@ export interface BrandedTrim extends Trim {
   brand: string
 }
 
-/** Every trim on the site: the RD range first, then the BAT range (src/data/batTrims.ts). */
+/** Every trim on the site: the Roberts Design range first, then the BAT range (src/data/batTrims.ts). */
 export const ALL_TRIMS: BrandedTrim[] = [
-  ...TRIMS.map((t) => ({ ...t, brand: 'RD' })),
+  ...TRIMS.map((t) => ({ ...t, brand: 'Roberts Design' })),
   ...BAT_TRIMS.map((t) => ({ ...t, brand: 'BAT' })),
 ]
 

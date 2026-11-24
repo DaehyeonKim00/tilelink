@@ -1,6 +1,6 @@
 // Colour swatches for the trim colour buttons. Each brand uses its own catalogue's finishes:
 // - BAT: the circles from the BAT Trims Colour Range page, public/images/swatches/<CODE>.png
-// - RD: a close-up of each finish from the RD Trim Finishes pages, public/images/swatches/rd/<name>.png
+// - Roberts Design: a close-up of each finish from the Roberts Design Trim Finishes pages, public/images/swatches/rd/<name>.png
 // A colour with no swatch in its own catalogue (infill colours, brass, stainless, PVC) shows a plain striped circle.
 const BASE = import.meta.env.BASE_URL
 
@@ -40,6 +40,6 @@ const slug = (s: string) => s.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(
 export function swatchFor(brand: string, colour: string): string | undefined {
   const name = colour.replace(/ UV$/, '')
   if (brand === 'BAT') return BAT[name] ? `${BASE}images/swatches/${BAT[name]}.png` : undefined
-  if (brand === 'RD') return RD.has(name) ? `${BASE}images/swatches/rd/${slug(name)}.png` : undefined
+  if (brand === 'Roberts Design') return RD.has(name) ? `${BASE}images/swatches/rd/${slug(name)}.png` : undefined
   return undefined
 }
